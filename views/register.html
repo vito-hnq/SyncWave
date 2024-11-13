@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastro - SyncWave</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+
+    :root {
+      --azul-claro: #4da6ff;
+      --azul-escuro: #1a2e4f;
+      --preto: #0d0d0d;
+      --cinza-claro: #e0e0e0;
+      --sombra-azul: rgba(80, 201, 255, 0.5);
+    }
+
+    body {
+      background: radial-gradient(circle at 50% 50%, var(--azul-claro), var(--azul-escuro));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      color: var(--cinza-claro);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+    }
+
+    .container {
+      max-width: 400px;
+      background-color: rgba(20, 20, 20, 0.95);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(8px);
+      text-align: center;
+      border: 1px solid var(--azul-claro);
+    }
+
+    .brand-title {
+      font-size: 3rem;
+      font-weight: 700;
+      color: var(--azul-claro);
+      margin-bottom: 1rem;
+      text-shadow: 0 0 10px var(--azul-claro);
+    }
+
+    .btn-primary {
+      background-image: linear-gradient(135deg, var(--azul-claro), var(--azul-escuro));
+      border: none;
+      border-radius: 25px;
+      transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px var(--sombra-azul);
+    }
+
+    .form-control {
+      background-color: #121212;
+      border: 1px solid #333;
+      color: var(--cinza-claro);
+    }
+
+    .form-control:focus {
+      border-color: var(--azul-claro);
+      box-shadow: 0 0 8px var(--sombra-azul);
+    }
+
+    .password-field {
+      position: relative;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: 2px;
+      top: 70%;
+      transform: translateY(-50%);
+      color: #777;
+      cursor: pointer;
+      padding: 0.3rem;
+    }
+
+    .login-link {
+      color: var(--azul-claro);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .login-link:hover {
+      color: var(--azul-escuro);
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="brand-title">SyncWave</div>
+    <h2 class="text-center mb-4">Cadastro</h2>
+    <form action="/register" method="POST">
+      <div class="mb-3">
+        <label for="username" class="form-label">Nome de Usuário</label>
+        <input type="text" class="form-control" id="username" name="username" placeholder="Digite seu nome de usuário" required>
+      </div>
+      <div class="mb-3">
+        <label for="email" class="form-label">E-mail</label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="Digite seu e-mail" required>
+      </div>
+      <div class="mb-3 password-field">
+        <label for="password" class="form-label">Senha</label>
+        <input type="password" class="form-control" id="password" name="password" placeholder="Digite sua senha" required>
+        <span class="password-toggle" onclick="togglePassword('password')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zm-8 4a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
+            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/>
+          </svg>
+        </span>
+      </div>
+      <div class="mb-3 password-field">
+        <label for="confirmPassword" class="form-label">Confirme a Senha</label>
+        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirme sua senha" required>
+        <span class="password-toggle" onclick="togglePassword('confirmPassword')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-eye" viewBox="0 0 16 16">
+            <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zm-8 4a4 4 0 1 1 0-8 4 4 0 0 1 0 8z"/>
+            <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5z"/>
+          </svg>
+        </span>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Cadastrar</button>
+    </form>
+    <div class="text-center mt-3">
+      <p>Já tem uma conta? <a href="login.html" class="login-link">Entrar</a></p>
+    </div>
+  </div>
+
+  <script>
+    function togglePassword(id) {
+      const passwordInput = document.getElementById(id);
+      const passwordToggle = document.querySelector(`[onclick="togglePassword('${id}')"] svg`);
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        passwordToggle.classList.replace('bi-eye', 'bi-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        passwordToggle.classList.replace('bi-eye-slash', 'bi-eye');
+      }
+    }
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

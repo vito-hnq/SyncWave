@@ -37,6 +37,10 @@
       margin-right: 10px;
     }
 
+    .navbar-brand h3 {
+      color: white; /* Definindo o nome SyncWave para branco */
+    }
+
     .navbar-nav .nav-link {
       color: var(--cinza-claro) !important;
       font-weight: bold;
@@ -89,6 +93,12 @@
       color: var(--cinza-claro);
       margin: 1rem 0;
       transition: transform 0.3s ease, box-shadow 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center; /* Centraliza horizontalmente */
+      justify-content: center; /* Centraliza verticalmente */
+      height: 100%;
+      text-align: center;
     }
 
     .feature-card:hover {
@@ -129,24 +139,24 @@
   </div>
 
   <section id="features" class="mt-5">
-    <div class="row text-center justify-content-center">
-      <div class="col-md-3">
+    <div class="row text-center justify-content-center d-flex align-items-stretch">
+      <div class="col-md-3 d-flex">
         <div class="feature-card">
-          <img src="https://i.pinimg.com/564x/04/62/d2/0462d203c6e50bbb5f8b7d489f49be1c.jpg" alt="Ícone de segurança" class="img-100">
+          <img src="/src/models/segurança.png" alt="Ícone de segurança" class="img-100">
           <h3 class="section-title">Segurança</h3>
           <p>Transferência segura de arquivos usando SFTP para garantir a integridade dos seus dados.</p>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-3 d-flex">
         <div class="feature-card">
-          <img src="https://i.pinimg.com/564x/5e/52/f5/5e52f5ce55305144df95d0dc18aec997.jpg" alt="Ícone de pasta privada" class="img-100">
+          <img src="/src/models/pasta privada.png" alt="Ícone de pasta privada" class="img-100">
           <h3 class="section-title">Pastas Privadas</h3>
           <p>Armazene seus arquivos com privacidade e controle total sobre o acesso.</p>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-md-3 d-flex">
         <div class="feature-card">
-          <img src="https://i.pinimg.com/564x/c9/49/80/c9498011cd43d5fa3560f3fd43302bd5.jpg" alt="Ícone de compartilhamento" class="img-100">
+          <img src="/src/models/compatilhamento.png" alt="Ícone de compartilhamento" class="img-100">
           <h3 class="section-title">Compartilhamento</h3>
           <p>Colabore com facilidade, compartilhando arquivos com sua equipe em um ambiente seguro.</p>
         </div>

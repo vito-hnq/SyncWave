@@ -6,16 +6,16 @@
   <title>Login - SyncWave</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
-
     :root {
       --azul-claro: #4da6ff;
       --azul-escuro: #1a2e4f;
+      --azul-fundo-claro: #a8d0ff;
       --preto: #0d0d0d;
       --cinza-claro: #e0e0e0;
     }
-
+  
     body {
-      background: radial-gradient(circle at 50% 50%, var(--azul-claro), var(--azul-escuro));
+      background: radial-gradient(circle, var(--azul-fundo-claro), var(--azul-claro));
       display: flex;
       align-items: center;
       justify-content: center;
@@ -25,17 +25,16 @@
       overflow: hidden;
     }
 
+  
     .container {
       max-width: 400px;
-      background-color: rgba(20, 20, 20, 0.95);
       padding: 2rem;
       border-radius: 15px;
-      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.7);
-      backdrop-filter: blur(8px);
       text-align: center;
-      border: 1px solid var(--azul-claro);
+      background-color: var(--azul-escuro); /* Azul sólido na div */
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3); /* Sombra suave */
     }
-
+  
     .brand-title {
       font-size: 3rem;
       font-weight: 700;
@@ -43,34 +42,34 @@
       margin-bottom: 1rem;
       text-shadow: 0 0 10px var(--azul-claro);
     }
-
+  
     .btn-primary {
       background-image: linear-gradient(135deg, var(--azul-claro), var(--azul-escuro));
       border: none;
       border-radius: 25px;
       transition: transform 0.3s, box-shadow 0.3s;
     }
-
+  
     .btn-primary:hover {
       transform: scale(1.05);
       box-shadow: 0 4px 12px rgba(80, 201, 255, 0.5);
     }
-
+  
     .form-control {
-      background-color: #121212;
-      border: 1px solid #333;
+      background-color: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.4);
       color: var(--cinza-claro);
     }
-
+  
     .form-control:focus {
       border-color: var(--azul-claro);
       box-shadow: 0 0 8px rgba(80, 201, 255, 0.5);
     }
-
+  
     .password-field {
       position: relative;
     }
-
+  
     .password-toggle {
       position: absolute;
       right: 2px;
@@ -80,19 +79,19 @@
       cursor: pointer;
       padding: 0.3rem;
     }
-
+  
     .register-link {
       color: var(--azul-claro);
       text-decoration: none;
       transition: color 0.2s;
     }
-
+  
     .register-link:hover {
       color: var(--azul-escuro);
       text-decoration: underline;
     }
-
-  </style>
+  </style>  
+  
 </head>
 <body>
   <div class="container">

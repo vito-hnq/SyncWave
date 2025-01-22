@@ -1,0 +1,45 @@
+{
+  "usuarios": [
+    {
+      "id": 1,
+      "username": "Carlos",
+      "email": "carlos@email.com",
+      "password": "senha123"
+    },
+    {
+      "id": "2350",
+      "username": "luiz.p",
+      "email": "luizphilipe320@gmail.com",
+      "password": "10582414"
+    },
+    {
+      "id": "1a02",
+      "username": "VIctor HEnrique",
+      "email": "vhenriquevhf@gmail.com",
+      "password": "vito123"
+    }
+  ],
+  "arquivos": [
+    {
+      "id": "file002",
+      "nome": "imagem.png",
+      "url": "http://example.com/files/imagem.png"
+    },
+    {
+      "id": "file003",
+      "nome": "relatorio.xlsx",
+      "url": "http://example.com/files/relatorio.xlsx"
+    },
+    {
+      "id": "file004",
+      "nome": "apresentacao.pptx",
+      "url": "http://example.com/files/apresentacao.pptx"
+    },
+    {
+      "id": "file005",
+      "nome": "planilha.csv",
+      "url": "http://example.com/files/planilha.csv"
+    }
+  ],
+  "atividades": []
+}

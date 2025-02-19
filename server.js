@@ -1,60 +1,68 @@
 const express = require('express');
-const mysql = require('mysql2/promise');
-const dotenv = require('dotenv');
-
-dotenv.config();
-
-const requiredEnv = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_NAME'];
-for (const envVar of requiredEnv) {
-  if (!process.env[envVar]) {
-    console.error(`Erro: A variável de ambiente ${envVar} não está definida.`);
-    process.exit(1);
-  }
-}
-
+const mysql = require('mysql2');
+const cors = require('cors'); 
+const bcrypt = require('bcrypt'); 
 const app = express();
+const port = 3000;
+
 app.use(express.json());
+app.use(cors()); 
 
-let db;
+const connection = mysql.createConnection({
+  host: 'localhost',
+  user: 'syncwave',  
+  password: '1234',  
+  database: 'syncwave_db'  
+});
 
-(async () => {
-  try {
-    db = await mysql.createConnection({
-      host: process.env.DB_HOST,
-      user: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME
-    });
-
-    console.log('Conectado ao MySQL!');
-  } catch (err) {
+connection.connect((err) => {
+  if (err) {
     console.error('Erro ao conectar ao MySQL:', err);
-    process.exit(1);
+    return;
   }
-})();
+  console.log('Conectado ao MySQL!');
+});
 
-// Rota para cadastrar usuário
-app.post('/usuarios', async (req, res) => {
+// Rota para cadastrar um novo usuário
+app.post('/usuarios', (req, res) => {
   const { username, email, password } = req.body;
 
+  // Verificando se todos os campos foram fornecidos
   if (!username || !email || !password) {
     return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
   }
 
-  try {
-    const query = 'INSERT INTO usuarios (username, email, password) VALUES (?, ?, ?)';
-    const [result] = await db.execute(query, [username, email, password]);
+  // Verificar se o e-mail já existe
+  connection.query('SELECT * FROM usuarios WHERE email = ?', [email], (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar e-mail:', err);
+      return res.status(500).json({ message: 'Erro ao verificar e-mail.' });
+    }
 
-    res.status(201).json({ message: 'Usuário cadastrado com sucesso!', userId: result.insertId });
-  } catch (err) {
-    console.error('Erro ao inserir usuário:', err);
-    res.status(500).json({ message: 'Erro ao cadastrar usuário.' });
-  }
+    if (results.length > 0) {
+      return res.status(400).json({ message: 'E-mail já cadastrado.' });
+    }
+
+    // Criptografar a senha antes de salvar
+    bcrypt.hash(password, 10, (err, hashedPassword) => {
+      if (err) {
+        console.error('Erro ao criptografar senha:', err);
+        return res.status(500).json({ message: 'Erro ao cadastrar usuário.' });
+      }
+
+      // Inserir o novo usuário no banco de dados com a senha criptografada
+      connection.query('INSERT INTO usuarios (username, email, password) VALUES (?, ?, ?)', [username, email, hashedPassword], (err, results) => {
+        if (err) {
+          console.error('Erro ao inserir usuário:', err);
+          return res.status(500).json({ message: 'Erro ao cadastrar usuário.' });
+        }
+
+        return res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
+      });
+    });
+  });
 });
 
-const port = process.env.PORT || 3000;
 app.listen(port, () => {
   console.log(`Servidor rodando na porta ${port}`);
 });
-
-

@@ -5,11 +5,12 @@ dotenv.config();
 
 // Configuração de conexão com o MySQL
 const connection = mysql.createConnection({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME
+  host: 'localhost',
+  user: 'syncwave',
+  password: '1234',
+  database: 'syncwave_db'
 });
+
 
 // Conectar ao banco
 connection.connect((err) => {

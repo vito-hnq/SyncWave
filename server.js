@@ -1,18 +1,18 @@
 const express = require('express');
 const mysql = require('mysql2');
-const cors = require('cors'); 
-const bcrypt = require('bcrypt'); 
+const cors = require('cors');
+const bcrypt = require('bcryptjs'); // Use bcryptjs, que é mais adequado para Node.js
 const app = express();
 const port = 3000;
 
 app.use(express.json());
-app.use(cors()); 
+app.use(cors());
 
 const connection = mysql.createConnection({
   host: 'localhost',
-  user: 'syncwave',  
-  password: '1234',  
-  database: 'syncwave_db'  
+  user: 'syncwave',
+  password: '1234',
+  database: 'syncwave_db'
 });
 
 connection.connect((err) => {
@@ -59,6 +59,43 @@ app.post('/usuarios', (req, res) => {
 
         return res.status(201).json({ message: 'Usuário cadastrado com sucesso!' });
       });
+    });
+  });
+});
+
+// Rota para autenticação de login
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'E-mail e senha são obrigatórios.' });
+  }
+
+  // Verificar se o e-mail existe no banco de dados
+  connection.query('SELECT * FROM usuarios WHERE email = ?', [email], (err, results) => {
+    if (err) {
+      console.error('Erro ao verificar e-mail:', err);
+      return res.status(500).json({ message: 'Erro ao verificar e-mail.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(400).json({ message: 'E-mail ou senha inválidos.' });
+    }
+
+    const user = results[0];
+
+    // Verificar se a senha fornecida corresponde ao hash da senha no banco de dados
+    bcrypt.compare(password, user.password, (err, isMatch) => {
+      if (err) {
+        console.error('Erro ao comparar senha:', err);
+        return res.status(500).json({ message: 'Erro ao comparar senha.' });
+      }
+
+      if (isMatch) {
+        return res.status(200).json({ message: 'Login bem-sucedido' });
+      } else {
+        return res.status(400).json({ message: 'E-mail ou senha inválidos.' });
+      }
     });
   });
 });

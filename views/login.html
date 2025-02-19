@@ -153,6 +153,8 @@
       .then(data => {
         const errorMessage = document.getElementById('error-message');
         if (data.message === 'Login bem-sucedido') {
+          // Armazena o token no localStorage
+          localStorage.setItem('token', data.token);
           window.location.href = 'dashboard.html'; // Redireciona para o dashboard
         } else {
           errorMessage.textContent = data.message; // Exibe a mensagem de erro

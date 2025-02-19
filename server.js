@@ -1,7 +1,8 @@
 const express = require('express');
 const mysql = require('mysql2');
 const cors = require('cors');
-const bcrypt = require('bcryptjs'); // Use bcryptjs, que é mais adequado para Node.js
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken'); // Importando o jsonwebtoken
 const app = express();
 const port = 3000;
 
@@ -22,6 +23,22 @@ connection.connect((err) => {
   }
   console.log('Conectado ao MySQL!');
 });
+
+// Chave secreta para gerar o JWT
+const JWT_SECRET = 'secreta_syncwave';
+
+// Função para verificar o token JWT
+const authenticateToken = (req, res, next) => {
+  const token = req.headers['authorization'] && req.headers['authorization'].split(' ')[1]; // Pegando o token do cabeçalho
+  
+  if (!token) return res.sendStatus(403); // Se não houver token
+  
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) return res.sendStatus(403); // Se o token for inválido
+    req.user = user;
+    next();
+  });
+};
 
 // Rota para cadastrar um novo usuário
 app.post('/usuarios', (req, res) => {
@@ -63,7 +80,7 @@ app.post('/usuarios', (req, res) => {
   });
 });
 
-// Rota para autenticação de login
+// Rota para autenticação de login e geração do JWT
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -92,9 +109,60 @@ app.post('/login', (req, res) => {
       }
 
       if (isMatch) {
-        return res.status(200).json({ message: 'Login bem-sucedido' });
+        // Gerar o token JWT após o login bem-sucedido
+        const token = jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, { expiresIn: '1h' });
+        return res.status(200).json({ message: 'Login bem-sucedido', token: token });
       } else {
         return res.status(400).json({ message: 'E-mail ou senha inválidos.' });
+      }
+    });
+  });
+});
+
+// Rota para obter o nome do usuário logado
+app.get('/getUserName', authenticateToken, (req, res) => {
+  const userId = req.user.id;
+
+  // Buscar o usuário no banco de dados usando o ID do usuário
+  connection.query('SELECT username FROM usuarios WHERE id = ?', [userId], (err, results) => {
+    if (err) {
+      console.error('Erro ao buscar nome do usuário:', err);
+      return res.status(500).json({ message: 'Erro ao buscar nome do usuário.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'Usuário não encontrado.' });
+    }
+
+    const user = results[0];
+    return res.json({ name: user.username });
+  });
+});
+
+// Rota para obter o nome do usuário logado
+app.get('/getUserName', (req, res) => {
+  const token = req.headers['authorization'];
+  if (!token) {
+    return res.status(401).json({ message: 'Acesso não autorizado.' });
+  }
+
+  // Decodificar o token (supondo que você use algo como JWT)
+  jwt.verify(token.split(' ')[1], 'seu-segredo', (err, decoded) => {
+    if (err) {
+      return res.status(500).json({ message: 'Erro ao verificar o token.' });
+    }
+
+    // Buscar o usuário no banco de dados usando o ID decodificado do token
+    connection.query('SELECT username FROM usuarios WHERE id = ?', [decoded.id], (err, results) => {
+      if (err) {
+        console.error('Erro ao buscar usuário:', err);
+        return res.status(500).json({ message: 'Erro ao buscar o nome do usuário.' });
+      }
+
+      if (results.length > 0) {
+        return res.status(200).json({ name: results[0].username });
+      } else {
+        return res.status(404).json({ message: 'Usuário não encontrado.' });
       }
     });
   });

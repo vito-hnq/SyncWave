@@ -1,0 +1,104 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// Modelo para usuários do sistema
+model User {
+  id              Int             @id @default(autoincrement())
+  username        String          @unique
+  email           String          @unique
+  password        String
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+  role            String          @default("user") // Pode ser "user" ou "admin"
+  active          Boolean         @default(true)
+  lastLogin       DateTime?
+  
+  // Relacionamentos
+  sftpConfig      SftpConfig?
+  fileHistory     FileHistory[]
+  permissions     Permission[]
+  fileMetadata    FileMetadata[]
+}
+
+// Configuração SFTP do usuário
+model SftpConfig {
+  id               Int       @id @default(autoincrement())
+  userId           Int       @unique
+  host             String
+  port             Int       @default(22)
+  username         String
+  password         String?
+  privateKeyPath   String?
+  usePrivateKey    Boolean   @default(false)
+  remoteBasePath   String    @default("/")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  
+  // Relacionamento com usuário
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Histórico de ações do usuário sobre arquivos
+model FileHistory {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  action       String   // "UPLOAD", "DOWNLOAD", "DELETE", "LIST", "CREATE_DIR", "RENAME"
+  path         String
+  filename     String?
+  size         Int?
+  timestamp    DateTime @default(now())
+  
+  // Relacionamento com usuário
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Metadados de arquivos - ajuda a manter informações sobre arquivos sem consultá-los remotamente
+model FileMetadata {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  path         String
+  filename     String
+  isDirectory  Boolean  @default(false)
+  size         Int?
+  lastModified DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relacionamento com usuário
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Relacionamento com permissões
+  permissions  Permission[]
+  
+  // Índice composto para evitar duplicatas
+  @@unique([userId, path])
+}
+
+// Permissões de acesso a arquivos
+model Permission {
+  id           Int      @id @default(autoincrement())
+  userId       Int
+  fileId       Int
+  canRead      Boolean  @default(true)
+  canWrite     Boolean  @default(false)
+  canDelete    Boolean  @default(false)
+  canShare     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relacionamentos
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  file         FileMetadata @relation(fields: [fileId], references: [id], onDelete: Cascade)
+  
+  // Índice composto para evitar duplicatas
+  @@unique([userId, fileId])
+}

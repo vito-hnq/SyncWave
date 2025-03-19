@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pasta Compartilhada</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --azul-claro: #4da6ff;
+      --azul-escuro: #1a2e4f;
+      --preto: #0d0d0d;
+      --cinza-claro: #cdd7e3;
+    }
+
+    body {
+      background-color: var(--preto);
+      color: white; 
+      padding-bottom: 2rem;
+    }
+
+    .navbar {
+      background-color: var(--azul-escuro);
+      padding: 1.5rem 2rem;
+      border-bottom: 2px solid var(--azul-claro);
+    }
+
+    .navbar-brand img {
+      width: 75px;
+      height: 75px;
+      margin-right: 10px;
+    }
+
+    .navbar-brand h3 {
+      color: white;
+    }
+
+    .navbar-nav .nav-link {
+      color: white !important; 
+      font-weight: bold;
+      margin-right: 1.5rem;
+      transition: color 0.3s ease;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: var(--azul-claro) !important;
+    }
+
+    .btn-primary, .btn-info, .btn-danger {
+      border: none;
+      color: var(--preto);
+      transition: transform 0.3s ease, background-color 0.3s;
+    }
+
+    .btn-primary:hover, .btn-info:hover, .btn-danger:hover {
+      transform: scale(1.05);
+    }
+
+    .btn-primary {
+      background-color: var(--azul-claro);
+    }
+
+    .btn-info {
+      background-color: var(--azul-escuro);
+      color: var(--cinza-claro);
+    }
+
+    .btn-danger {
+      background-color: #dc3545;
+    }
+
+    .section-title {
+      color: white;
+      font-weight: bold;
+      margin-top: 2rem;
+    }
+
+    .table-striped > tbody > tr:nth-of-type(odd) {
+      background-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .table-striped > tbody > tr:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .footer {
+      margin-top: 4rem;
+      text-align: center;
+      color: white; 
+      padding: 1.5rem 0;
+    }
+
+    .table th, .table td {
+      color: white !important; 
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg">
+    <a class="navbar-brand d-flex align-items-center" href="#">
+      <img src="../src/icons/logo.png" alt="Logo SyncWave"> 
+      <h3><b><i>SyncWave</i></b></h3>
+    </a>
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" href="dashboard.html">Dashboard</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="logout.html">Sair</a> <!-- Redirecionamento para logout -->
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container mt-5">
+    <h2 class="section-title">Minhas Pastas Compartilhadas</h2>
+    <button class="btn btn-primary mb-4" id="shareButton">
+      <i class="fas fa-share-alt"></i> Compartilhar Arquivo
+    </button>
+    <table class="table table-striped table-hover text-center">
+      <thead>
+        <tr>
+          <th scope="col">Nome do Arquivo</th>
+          <th scope="col">Ações</th>
+        </tr>
+      </thead>
+      <tbody id="sharedFilesTableBody">
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    <p>&copy; 2024 SyncWave. Todos os direitos reservados.</p>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+  <script>
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      window.location.href = 'login.html'; // Redireciona para o login se não houver token
+    }
+
+    function loadSharedFiles() {
+      fetch('/api/shared-files', { // Endpoint corrigido
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+        .then(response => response.json())
+        .then(files => {
+          const sharedFilesTableBody = document.getElementById('sharedFilesTableBody');
+          sharedFilesTableBody.innerHTML = '';
+          
+          files.forEach(file => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+              <td>${file.nome}</td>
+              <td>
+                <button class="btn btn-info me-2" onclick="downloadFile('${file.id}')">
+                  <i class="fas fa-download"></i> Download
+                </button>
+                <button class="btn btn-danger" onclick="deleteFile('${file.id}')">
+                  <i class="fas fa-trash-alt"></i> Deletar
+                </button>
+              </td>
+            `;
+            sharedFilesTableBody.appendChild(row);
+          });
+        })
+        .catch(error => {
+          console.error('Erro ao carregar arquivos compartilhados:', error);
+        });
+    }
+
+    function downloadFile(fileId) {
+      fetch(`/api/shared-files/${fileId}/download`, { // Endpoint corrigido
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+        .then(response => response.blob())
+        .then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = fileId;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        })
+        .catch(error => console.error('Erro ao baixar o arquivo:', error));
+    }
+
+    function deleteFile(fileId) {
+      fetch(`/api/shared-files/${fileId}`, { // Endpoint corrigido
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+      })
+      .then(response => response.json())
+      .then(() => loadSharedFiles())
+      .catch(error => console.error('Erro ao deletar o arquivo:', error));
+    }
+
+    document.getElementById('shareButton').addEventListener('click', function() {
+      // Lógica para compartilhar arquivos
+      alert('Funcionalidade de compartilhamento em desenvolvimento.');
+    });
+
+    document.addEventListener('DOMContentLoaded', loadSharedFiles);
+  </script>
+</body>
+</html>
